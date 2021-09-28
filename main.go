@@ -17,7 +17,7 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strconv"
+	"strings"
 
 	"github.com/line/line-bot-sdk-go/v7/linebot"
 )
@@ -50,13 +50,41 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 		if event.Type == linebot.EventTypeMessage {
 			switch message := event.Message.(type) {
 			case *linebot.TextMessage:
-				quota, err := bot.GetMessageQuota().Do()
+
 				if err != nil {
 					log.Println("Quota err:", err)
 				}
-				if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(message.ID+":"+message.Text+" OK! remain message:"+strconv.FormatInt(quota.Value, 10))).Do(); err != nil {
-					log.Print(err)
+
+				switch operation, operationData := DetermineOperation(message.Text); operation {
+				case Error:
+					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("錯誤的輸入格式，請重新輸入！")).Do(); err != nil {
+						log.Print(err)
+					}
+				case KeepRecord:
+					record := ConvertToRecord(*operationData)
+					record.UserID = event.Source.UserID
+					if record.Save() {
+						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(fmt.Sprintf("成功儲存！\n%s-%d-%s", record.Class, record.Cost, record.Memo))).Do(); err != nil {
+							log.Print(err)
+						}
+					} else {
+						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("儲存資料錯誤，請晚點稍後再試！")).Do(); err != nil {
+							log.Print(err)
+						}
+					}
+				case GetRecord:
+					var recordBuilder strings.Builder
+					records := GetLastRecords(uint(operationData.Number))
+					for _, r := range records {
+						recordBuilder.WriteString(fmt.Sprintf("%s %d %s\n", r.CreatedAt.Format("2006-01-02"), r.Cost, r.Memo))
+					}
+
+					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(recordBuilder.String())).Do(); err != nil {
+						log.Print(err)
+					}
 				}
+
+				log.Println(message.Text)
 			}
 		}
 	}
