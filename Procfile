@@ -1,2 +1,2 @@
-web: LineBotCostTracker
+web: LineBot-CostTracker
 
