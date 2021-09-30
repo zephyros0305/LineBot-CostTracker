@@ -17,13 +17,13 @@ type Record struct {
 }
 
 func ConvertToRecord(data OperationData) *Record {
-	var record *Record
+	var record Record
 
 	record.Class = data.CostType
 	record.Cost = data.Number
 	record.Memo = data.Memo
 
-	return record
+	return &record
 }
 
 func (r *Record) Save() bool {
