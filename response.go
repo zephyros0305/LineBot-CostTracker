@@ -1,8 +1,9 @@
 package main
 
 import (
-	"LineBot-CostTracker/vendor/github.com/line/line-bot-sdk-go/v7/linebot"
 	"fmt"
+
+	"github.com/line/line-bot-sdk-go/v7/linebot"
 )
 
 func GetListRecordResponse(records []Record) *linebot.BubbleContainer {
