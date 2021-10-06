@@ -17,7 +17,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strings"
 
 	"github.com/line/line-bot-sdk-go/v7/linebot"
 )
@@ -73,13 +72,10 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 						}
 					}
 				case GetRecord:
-					var recordBuilder strings.Builder
 					records := GetLastRecords(uint(operationData.Number))
-					for _, r := range records {
-						recordBuilder.WriteString(fmt.Sprintf("%s %d %s\n", r.CreatedAt.Format("2006-01-02"), r.Cost, r.Memo))
-					}
+					responseContainer := GetListRecordResponse(records)
 
-					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(recordBuilder.String())).Do(); err != nil {
+					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewFlexMessage("Record list", responseContainer)).Do(); err != nil {
 						log.Print(err)
 					}
 				}
