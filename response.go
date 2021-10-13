@@ -11,30 +11,31 @@ func GetListRecordResponse(records []Record) *linebot.BubbleContainer {
 
 	for _, r := range records {
 		recordContent := &linebot.BoxComponent{
-			Type:   linebot.FlexComponentTypeBox,
-			Layout: linebot.FlexBoxLayoutTypeHorizontal,
+			Type:          linebot.FlexComponentTypeBox,
+			Layout:        linebot.FlexBoxLayoutTypeHorizontal,
+			PaddingTop:    linebot.FlexComponentPaddingTypeXs,
+			PaddingBottom: linebot.FlexComponentPaddingTypeXs,
 			Contents: []linebot.FlexComponent{
 				&linebot.TextComponent{
 					Type:   linebot.FlexComponentTypeText,
 					Weight: linebot.FlexTextWeightTypeBold,
-					Size:   linebot.FlexTextSizeTypeSm,
+					Style:  linebot.FlexTextStyleTypeItalic,
 					Color:  "#000000",
-					Flex:   linebot.IntPtr(1),
+					Flex:   linebot.IntPtr(2),
 					Text:   r.CreatedAt.Format("2006-01-02"),
 				},
 				&linebot.TextComponent{
 					Type:  linebot.FlexComponentTypeText,
-					Size:  linebot.FlexTextSizeTypeSm,
 					Color: "#111111",
-					Flex:  linebot.IntPtr(2),
+					Flex:  linebot.IntPtr(3),
 					Text:  r.Memo,
 				},
 				&linebot.TextComponent{
 					Type:  linebot.FlexComponentTypeText,
 					Size:  linebot.FlexTextSizeTypeSm,
 					Align: linebot.FlexComponentAlignTypeEnd,
-					Color: "#000000",
-					Flex:  linebot.IntPtr(0),
+					Color: "#dd0000",
+					Flex:  linebot.IntPtr(1),
 					Text:  fmt.Sprintf("$%d", r.Cost),
 				},
 			},
