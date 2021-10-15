@@ -78,6 +78,8 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewFlexMessage("Record list", responseContainer)).Do(); err != nil {
 						log.Print(err)
 					}
+				case GetStatistic:
+
 				}
 
 				log.Println(message.Text)
