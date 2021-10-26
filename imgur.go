@@ -4,10 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
-	"mime/multipart"
 	"net/http"
 )
 
@@ -42,16 +40,16 @@ type ImageData struct {
 	Link          string `json:"link"`
 }
 
-func UploadToImgur(image io.Reader, token string) string {
-	var buf = new(bytes.Buffer)
-	writer := multipart.NewWriter(buf)
+func UploadToImgur(imageBuffer *bytes.Buffer, token string) string {
+	// var buf = new(bytes.Buffer)
+	// writer := multipart.NewWriter(buf)
 
-	part, _ := writer.CreateFormFile("image", "dont care about name")
-	io.Copy(part, image)
+	// part, _ := writer.CreateFormFile("image", "dont care about name")
+	// io.Copy(part, image)
 
-	writer.Close()
-	req, _ := http.NewRequest("POST", "https://api.imgur.com/3/image", buf)
-	req.Header.Set("Content-Type", writer.FormDataContentType())
+	// writer.Close()
+	req, _ := http.NewRequest("POST", "https://api.imgur.com/3/image", imageBuffer)
+	req.Header.Set("Content-Type", http.DetectContentType(imageBuffer.Bytes()))
 	req.Header.Set("Authorization", "Bearer "+token)
 
 	client := &http.Client{}
