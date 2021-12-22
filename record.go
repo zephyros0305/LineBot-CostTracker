@@ -16,6 +16,11 @@ type Record struct {
 	UserID string
 }
 
+type StatData struct {
+	Class   string
+	CostSum uint64
+}
+
 func ConvertToRecord(data OperationData) *Record {
 	var record Record
 
@@ -51,6 +56,18 @@ func GetLastRecords(num uint) []Record {
 	}
 
 	return records
+}
+
+func GetStatData() []StatData {
+	var result []StatData
+
+	db := connectDB()
+
+	if db != nil {
+		db.Model(&Record{}).Select("class, sum(cost) as costSum").Group("class").Find(&result)
+	}
+
+	return result
 }
 
 func connectDB() *gorm.DB {

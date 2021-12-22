@@ -7,21 +7,12 @@ import (
 	"github.com/wcharczuk/go-chart/v2"
 )
 
-func GetChart() *bytes.Buffer {
+func GetChart(data []chart.Value) *bytes.Buffer {
 
 	pie := chart.PieChart{
 		Width:  512,
 		Height: 512,
-		Values: []chart.Value{
-			{Value: 5, Label: "Blue"},
-			{Value: 5, Label: "Green"},
-			{Value: 4, Label: "Gray"},
-			{Value: 4, Label: "Orange"},
-			{Value: 3, Label: "Brown"},
-			{Value: 3, Label: "??"},
-			{Value: 2, Label: "Deep Blue"},
-			{Value: 1, Label: "!!"},
-		},
+		Values: data,
 	}
 
 	var buf = new(bytes.Buffer)

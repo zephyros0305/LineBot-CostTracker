@@ -19,6 +19,7 @@ import (
 	"os"
 
 	"github.com/line/line-bot-sdk-go/v7/linebot"
+	"github.com/wcharczuk/go-chart/v2"
 )
 
 var bot *linebot.Client
@@ -57,18 +58,18 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 				switch operation, operationData := DetermineOperation(message.Text); operation {
 				case Error:
 					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("錯誤的輸入格式，請重新輸入！")).Do(); err != nil {
-						log.Print(err)
+						log.Println(err)
 					}
 				case KeepRecord:
 					record := ConvertToRecord(*operationData)
 					record.UserID = event.Source.UserID
 					if record.Save() {
 						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(fmt.Sprintf("成功儲存！\n%s-%d-%s", record.Class, record.Cost, record.Memo))).Do(); err != nil {
-							log.Print(err)
+							log.Println(err)
 						}
 					} else {
 						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("儲存資料錯誤，請晚點稍後再試！")).Do(); err != nil {
-							log.Print(err)
+							log.Println(err)
 						}
 					}
 				case GetRecord:
@@ -76,10 +77,21 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 					responseContainer := GetListRecordResponse(records)
 
 					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewFlexMessage("Record list", responseContainer)).Do(); err != nil {
-						log.Print(err)
+						log.Println(err)
 					}
 				case GetStatistic:
+					stats := GetStatData()
+					var chartData []chart.Value
 
+					for _, v := range stats {
+						chartData = append(chartData, chart.Value{Label: v.Class, Value: float64(v.CostSum)})
+					}
+
+					chart := GetChart(chartData)
+					link := UploadToImgur(chart, os.Getenv("ImgurSecret"))
+					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewImageMessage(link, link)).Do(); err != nil {
+						log.Println(err)
+					}
 				}
 
 				log.Println(message.Text)

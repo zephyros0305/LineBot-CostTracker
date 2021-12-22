@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-const getRegStr = `^(近|最近)`
+const getRegStr = `^(近|最近|前|圖)`
 
 func DetermineOperation(text string) (OperationType, *OperationData) {
 	var operationInfo OperationData
@@ -29,7 +29,7 @@ func DetermineOperation(text string) (OperationType, *OperationData) {
 					operationInfo.Number = num
 					return GetRecord, &operationInfo
 				} else {
-					return Error, nil
+					return GetStatistic, nil
 				}
 			default:
 				return Error, nil
