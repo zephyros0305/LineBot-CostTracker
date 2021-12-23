@@ -68,7 +68,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 							log.Println(err)
 						}
 					} else {
-						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("儲存資料錯誤，請晚點稍後再試！")).Do(); err != nil {
+						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("儲存資料錯誤，請稍後再試！")).Do(); err != nil {
 							log.Println(err)
 						}
 					}
@@ -88,9 +88,15 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 					}
 
 					chart := GetChart(chartData)
-					link := UploadToImgur(chart, os.Getenv("ImgurSecret"))
-					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewImageMessage(link, link)).Do(); err != nil {
-						log.Println(err)
+					link := UploadToImgur(chart, os.Getenv("ImgurAccessToken"))
+					if link != "" {
+						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewImageMessage(link, link)).Do(); err != nil {
+							log.Println(err)
+						}
+					} else {
+						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("統計圖表產出錯誤，請聯絡開發人員！")).Do(); err != nil {
+							log.Println(err)
+						}
 					}
 				}
 

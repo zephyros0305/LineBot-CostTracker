@@ -20,8 +20,8 @@
       "description": "Channel Secret",
       "required": true
     },
-    "ImgurSecret": {
-      "description": "Imgur Client Secret",
+    "ImgurAccessToken": {
+      "description": "Imgur Access Token",
       "required": true
     }
   }
