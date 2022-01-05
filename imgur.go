@@ -4,9 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
+	"mime/multipart"
 	"net/http"
+	"time"
 )
 
 type UploadResponse struct {
@@ -40,17 +43,20 @@ type ImageData struct {
 	Link          string `json:"link"`
 }
 
-func UploadToImgur(imageBuffer *bytes.Buffer, token string) string {
-	// var buf = new(bytes.Buffer)
-	// writer := multipart.NewWriter(buf)
+func UploadToImgur(byteImage []byte, clientId string) string {
+	var imgBuf = bytes.NewBuffer(byteImage)
+	buf := new(bytes.Buffer)
+	multiWriter := multipart.NewWriter(buf)
 
-	// part, _ := writer.CreateFormFile("image", "dont care about name")
-	// io.Copy(part, image)
+	now := time.Now()
 
-	// writer.Close()
-	req, _ := http.NewRequest("POST", "https://api.imgur.com/3/image", imageBuffer)
-	req.Header.Set("Content-Type", http.DetectContentType(imageBuffer.Bytes()))
-	req.Header.Set("Authorization", "Bearer "+token)
+	part, _ := multiWriter.CreateFormFile("image", fmt.Sprintf("chart%d", now.Unix()))
+	io.Copy(part, imgBuf)
+	multiWriter.Close()
+
+	req, _ := http.NewRequest("POST", "https://api.imgur.com/3/upload", buf)
+	req.Header.Set("Content-Type", multiWriter.FormDataContentType())
+	req.Header.Set("Authorization", "Client-ID "+clientId)
 
 	client := &http.Client{}
 	res, err := client.Do(req)
