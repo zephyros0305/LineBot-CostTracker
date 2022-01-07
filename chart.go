@@ -15,6 +15,8 @@ func GetChart(data []chart.Value) []byte {
 		Values: data,
 	}
 
+	log.Println("Chart data", data)
+
 	var buf = new(bytes.Buffer)
 	pie.Render(chart.PNG, buf)
 

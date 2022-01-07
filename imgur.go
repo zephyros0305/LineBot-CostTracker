@@ -54,6 +54,8 @@ func UploadToImgur(byteImage []byte, clientId string) string {
 	io.Copy(part, imgBuf)
 	multiWriter.Close()
 
+	log.Println("Upload to imgur buf=", buf)
+
 	req, _ := http.NewRequest("POST", "https://api.imgur.com/3/upload", buf)
 	req.Header.Set("Content-Type", multiWriter.FormDataContentType())
 	req.Header.Set("Authorization", "Client-ID "+clientId)

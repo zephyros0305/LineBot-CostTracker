@@ -51,6 +51,8 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 			switch message := event.Message.(type) {
 			case *linebot.TextMessage:
 
+				log.Println(message.Text)
+
 				if err != nil {
 					log.Println("Quota err:", err)
 				}
@@ -58,18 +60,18 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 				switch operation, operationData := DetermineOperation(message.Text); operation {
 				case Error:
 					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("錯誤的輸入格式，請重新輸入！")).Do(); err != nil {
-						log.Println(err)
+						log.Println("Line reply error=", err)
 					}
 				case KeepRecord:
 					record := ConvertToRecord(*operationData)
 					record.UserID = event.Source.UserID
 					if record.Save() {
 						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(fmt.Sprintf("成功儲存！\n%s-%d-%s", record.Class, record.Cost, record.Memo))).Do(); err != nil {
-							log.Println(err)
+							log.Println("Line reply error=", err)
 						}
 					} else {
 						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("儲存資料錯誤，請稍後再試！")).Do(); err != nil {
-							log.Println(err)
+							log.Println("Line reply error=", err)
 						}
 					}
 				case GetRecord:
@@ -77,7 +79,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 					responseContainer := GetListRecordResponse(records)
 
 					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewFlexMessage("Record list", responseContainer)).Do(); err != nil {
-						log.Println(err)
+						log.Println("Line reply error=", err)
 					}
 				case GetStatistic:
 					stats := GetStatData()
@@ -91,16 +93,14 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 					link := UploadToImgur(chart, os.Getenv("ImgurAccessToken"))
 					if link != "" {
 						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewImageMessage(link, link)).Do(); err != nil {
-							log.Println(err)
+							log.Println("Line reply error=", err)
 						}
 					} else {
 						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("統計圖表產出錯誤，請聯絡開發人員！")).Do(); err != nil {
-							log.Println(err)
+							log.Println("Line reply error=", err)
 						}
 					}
 				}
-
-				log.Println(message.Text)
 			}
 		}
 	}
