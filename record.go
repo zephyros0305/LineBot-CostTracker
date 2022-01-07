@@ -64,8 +64,10 @@ func GetStatData() []StatData {
 	db := connectDB()
 
 	if db != nil {
-		db.Model(&Record{}).Select("class, sum(cost) as costSum").Group("class").Find(&result)
+		db.Model(&Record{}).Select("class, sum(cost) as costSum").Group("class").Scan(&result)
 	}
+
+	log.Println("StatData=", result)
 
 	return result
 }
