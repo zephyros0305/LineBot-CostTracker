@@ -17,8 +17,8 @@ type Record struct {
 }
 
 type StatData struct {
-	Class   string
-	CostSum uint64
+	Class string
+	Total uint64
 }
 
 func ConvertToRecord(data OperationData) *Record {
@@ -64,7 +64,7 @@ func GetStatData() []StatData {
 	db := connectDB()
 
 	if db != nil {
-		rows, err := db.Model(&Record{}).Select("class, sum(cost) as costSum").Group("class").Rows()
+		rows, err := db.Model(&Record{}).Select("class, sum(cost) as total").Group("class").Rows()
 
 		if err == nil {
 			defer rows.Close()
