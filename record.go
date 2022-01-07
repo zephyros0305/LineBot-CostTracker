@@ -70,6 +70,7 @@ func GetStatData() []StatData {
 			defer rows.Close()
 
 			for rows.Next() {
+				log.Println("rows=", rows)
 				var temp StatData
 				db.ScanRows(rows, &temp)
 				result = append(result, temp)
