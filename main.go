@@ -86,7 +86,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 					var chartData []chart.Value
 
 					for _, v := range stats {
-						chartData = append(chartData, chart.Value{Label: v.Class, Value: float64(v.CostSum)})
+						chartData = append(chartData, chart.Value{Label: v.Class, Value: float64(v.Total)})
 					}
 
 					chart := GetChart(chartData)
