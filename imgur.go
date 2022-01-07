@@ -62,19 +62,19 @@ func UploadToImgur(byteImage []byte, clientId string) string {
 	res, err := client.Do(req)
 
 	if err != nil {
-		log.Println(err)
+		log.Println("Imgur API error=", err)
 		return ""
 	}
 	defer res.Body.Close()
 	jsonResponse, _ := ioutil.ReadAll(res.Body)
-	fmt.Println(string(jsonResponse))
+	log.Println("Imgur response:", string(jsonResponse))
 
 	var response UploadResponse
 	err = json.Unmarshal(jsonResponse, &response)
 	if err == nil {
 		return response.Data.Link
 	} else {
-		log.Println(err)
+		log.Println("Imgur response json unmarshal error=", err)
 		return ""
 	}
 }

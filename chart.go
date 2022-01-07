@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"log"
 
 	"github.com/wcharczuk/go-chart/v2"
 )
@@ -16,6 +17,8 @@ func GetChart(data []chart.Value) []byte {
 
 	var buf = new(bytes.Buffer)
 	pie.Render(chart.PNG, buf)
+
+	log.Println("Chart bytes", buf.Bytes())
 
 	return buf.Bytes()
 }
