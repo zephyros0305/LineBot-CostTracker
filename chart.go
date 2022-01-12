@@ -30,13 +30,11 @@ func GetChart(data []chart.Value) []byte {
 	var buf = new(bytes.Buffer)
 	pie.Render(chart.PNG, buf)
 
-	log.Println("Chart bytes", buf.Bytes())
-
 	return buf.Bytes()
 }
 
 func getZHFont() *truetype.Font {
-	fontFile := "NotoSansTC-Regular.otf"
+	fontFile := "/.fonts/NotoSansTC-Regular.otf"
 
 	fontBytes, err := ioutil.ReadFile(fontFile)
 	if err != nil {
