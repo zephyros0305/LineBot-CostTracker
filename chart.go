@@ -4,15 +4,25 @@ import (
 	"bytes"
 	"io/ioutil"
 	"log"
+	"sync"
 
 	"github.com/golang/freetype/truetype"
 	"github.com/wcharczuk/go-chart/v2"
 )
 
+var (
+	_defaultZHFontLock sync.Mutex
+	_defaultZHFont     *truetype.Font
+)
+
 func GetChart(data []chart.Value) []byte {
 
 	var dataWithFont []chart.Value
-	ZHFont := getZHFont()
+	ZHFont, err := getZHFont()
+
+	if err != nil {
+		log.Panicln("ZHFont load error=", err)
+	}
 
 	for _, d := range data {
 		d.Style = chart.Style{Font: ZHFont}
@@ -33,18 +43,28 @@ func GetChart(data []chart.Value) []byte {
 	return buf.Bytes()
 }
 
-func getZHFont() *truetype.Font {
-	fontFile := ".fonts/NotoSansTC-Regular.otf"
+func getZHFont() (*truetype.Font, error) {
 
-	fontBytes, err := ioutil.ReadFile(fontFile)
-	if err != nil {
-		log.Println(err)
-		return nil
+	if _defaultZHFont == nil {
+		_defaultZHFontLock.Lock()
+		defer _defaultZHFontLock.Unlock()
+		if _defaultZHFont == nil {
+			fontFile := ".fonts/TaipeiSansTCBeta-Regular.ttf"
+
+			fontBytes, err := ioutil.ReadFile(fontFile)
+			if err != nil {
+				log.Println(err)
+				return nil, err
+			}
+			font, err := truetype.Parse(fontBytes)
+			if err != nil {
+				log.Println(err)
+				return nil, err
+			}
+
+			_defaultZHFont = font
+		}
 	}
-	font, err := truetype.Parse(fontBytes)
-	if err != nil {
-		log.Println(err)
-		return nil
-	}
-	return font
+
+	return _defaultZHFont, nil
 }
