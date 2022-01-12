@@ -34,7 +34,7 @@ func GetChart(data []chart.Value) []byte {
 }
 
 func getZHFont() *truetype.Font {
-	fontFile := "/.fonts/NotoSansTC-Regular.otf"
+	fontFile := ".fonts/NotoSansTC-Regular.otf"
 
 	fontBytes, err := ioutil.ReadFile(fontFile)
 	if err != nil {
