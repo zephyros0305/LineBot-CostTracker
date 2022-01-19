@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"time"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -85,8 +86,36 @@ func GetStatData() []StatData {
 	return result
 }
 
+func GetMonthStatDataByUser(month time.Time, userId string) []StatData {
+	var result []StatData
+
+	db := connectDB()
+
+	nextMonth := month.AddDate(0, 1, 0)
+
+	if db != nil {
+		db.Model(&Record{}).Select("class, sum(cost) as total").Where("user_id = ? AND created_at BETWEEN ? and ?", userId, month, nextMonth).Group("class").Scan(&result)
+
+		// if err == nil {
+		// 	defer rows.Close()
+
+		// 	for rows.Next() {
+		// 		log.Println("rows=", rows)
+		// 		var temp StatData
+		// 		db.ScanRows(rows, &temp)
+		// 		result = append(result, temp)
+		// 	}
+		// } else {
+		// 	log.Println("GetStatData err=", err)
+		// }
+	}
+
+	log.Println("StatData=", result)
+
+	return result
+}
+
 func connectDB() *gorm.DB {
-	// dsn := "host=localhost user=gorm password=gorm dbname=gorm port=9920 sslmode=disable TimeZone=Asia/Taipei"
 	db, err := gorm.Open(postgres.Open(os.Getenv("DATABASE_URL")), &gorm.Config{})
 	if err != nil {
 		log.Println("failed to connect database.")

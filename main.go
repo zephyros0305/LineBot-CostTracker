@@ -17,6 +17,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/line/line-bot-sdk-go/v7/linebot"
 	"github.com/wcharczuk/go-chart/v2"
@@ -87,6 +88,28 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 
 					for _, v := range stats {
 						chartData = append(chartData, chart.Value{Label: v.Class, Value: float64(v.Total)})
+					}
+
+					chart := GetChart(chartData)
+					link := UploadToImgur(chart, os.Getenv("ImgurAccessToken"))
+					if link != "" {
+						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewImageMessage(link, link)).Do(); err != nil {
+							log.Println("Line reply error=", err)
+						}
+					} else {
+						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("統計圖表產出錯誤，請聯絡開發人員！")).Do(); err != nil {
+							log.Println("Line reply error=", err)
+						}
+					}
+				case GetUserMonthStatistic:
+					now := time.Now()
+					thisMonth := time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, now.Location())
+					stats := GetMonthStatDataByUser(thisMonth, event.Source.UserID)
+
+					var chartData []chart.Value
+
+					for _, v := range stats {
+						chartData = append(chartData, chart.Value{Label: fmt.Sprintf("%s $%d", v.Class, v.Total), Value: float64(v.Total)})
 					}
 
 					chart := GetChart(chartData)

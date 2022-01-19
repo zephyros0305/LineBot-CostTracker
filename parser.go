@@ -7,6 +7,7 @@ import (
 )
 
 const getRegStr = `^(近|最近|前|圖)`
+const testReg = `^(Mon)`
 
 func DetermineOperation(text string) (OperationType, *OperationData) {
 	var operationInfo OperationData
@@ -22,6 +23,7 @@ func DetermineOperation(text string) (OperationType, *OperationData) {
 		} else {
 			operaction := fields[0]
 			getReg := regexp.MustCompile(getRegStr)
+			testReg := regexp.MustCompile(testReg)
 			switch {
 			case getReg.FindStringIndex(operaction) != nil:
 				numStr := getReg.ReplaceAllString(operaction, "")
@@ -31,6 +33,8 @@ func DetermineOperation(text string) (OperationType, *OperationData) {
 				} else {
 					return GetStatistic, nil
 				}
+			case testReg.FindStringIndex(operaction) != nil:
+				return GetUserMonthStatistic, nil
 			default:
 				return Error, nil
 			}

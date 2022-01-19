@@ -7,6 +7,7 @@ const (
 	KeepRecord
 	GetRecord
 	GetStatistic
+	GetUserMonthStatistic
 )
 
 type OperationData struct {
