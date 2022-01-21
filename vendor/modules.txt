@@ -29,6 +29,9 @@ github.com/jinzhu/now
 # github.com/line/line-bot-sdk-go/v7 v7.10.0
 ## explicit
 github.com/line/line-bot-sdk-go/v7/linebot
+# github.com/robfig/cron/v3 v3.0.1
+## explicit
+github.com/robfig/cron/v3
 # github.com/wcharczuk/go-chart/v2 v2.1.0
 ## explicit
 github.com/wcharczuk/go-chart/v2

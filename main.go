@@ -20,6 +20,7 @@ import (
 	"time"
 
 	"github.com/line/line-bot-sdk-go/v7/linebot"
+	"github.com/robfig/cron/v3"
 	"github.com/wcharczuk/go-chart/v2"
 )
 
@@ -29,6 +30,33 @@ func main() {
 	var err error
 	bot, err = linebot.New(os.Getenv("ChannelSecret"), os.Getenv("ChannelAccessToken"))
 	log.Println("Bot:", bot, " err:", err)
+
+	c := cron.New(cron.WithChain(cron.SkipIfStillRunning(cron.DefaultLogger)))
+	c.AddFunc("*/5 * * * *", func() {
+		userId := os.Getenv("TestUserId")
+		now := time.Now()
+		thisMonth := time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, now.Location())
+		stats := GetMonthStatDataByUser(thisMonth, userId)
+
+		var chartData []chart.Value
+
+		for _, v := range stats {
+			chartData = append(chartData, chart.Value{Label: fmt.Sprintf("%s $%d", v.Class, v.Total), Value: float64(v.Total)})
+		}
+
+		chart := GetChart(chartData)
+		link := UploadToImgur(chart, os.Getenv("ImgurAccessToken"))
+		if link != "" {
+			if _, err = bot.PushMessage(userId, linebot.NewImageMessage(link, link)).Do(); err != nil {
+				log.Println("Line reply error=", err)
+			}
+		} else {
+			if _, err = bot.ReplyMessage(userId, linebot.NewTextMessage("統計圖表產出錯誤，請聯絡開發人員！")).Do(); err != nil {
+				log.Println("Line reply error=", err)
+			}
+		}
+	})
+	c.Run()
 	http.HandleFunc("/callback", callbackHandler)
 	port := os.Getenv("PORT")
 	addr := fmt.Sprintf(":%s", port)

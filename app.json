@@ -23,6 +23,10 @@
     "ImgurAccessToken": {
       "description": "Imgur Access Token",
       "required": true
+    },
+    "TestUserId":{
+      "description": "Test line userID",
+      "required":false
     }
   }
 }
