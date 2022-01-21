@@ -51,7 +51,7 @@ func main() {
 				log.Println("Line reply error=", err)
 			}
 		} else {
-			if _, err = bot.ReplyMessage(userId, linebot.NewTextMessage("統計圖表產出錯誤，請聯絡開發人員！")).Do(); err != nil {
+			if _, err = bot.PushMessage(userId, linebot.NewTextMessage("統計圖表產出錯誤，請聯絡開發人員！")).Do(); err != nil {
 				log.Println("Line reply error=", err)
 			}
 		}
