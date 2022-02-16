@@ -17,8 +17,13 @@ type Record struct {
 	UserID string
 }
 
-type StatData struct {
+type ClassWithSum struct {
 	Class string
+	Sum   uint64
+}
+
+type StatData struct {
+	Data  []ClassWithSum
 	Total uint64
 }
 
@@ -59,8 +64,8 @@ func GetLastRecords(num uint) []Record {
 	return records
 }
 
-func GetStatData() []StatData {
-	var result []StatData
+func GetStatData() []ClassWithSum {
+	var result []ClassWithSum
 
 	db := connectDB()
 
@@ -72,7 +77,7 @@ func GetStatData() []StatData {
 
 			for rows.Next() {
 				log.Println("rows=", rows)
-				var temp StatData
+				var temp ClassWithSum
 				db.ScanRows(rows, &temp)
 				result = append(result, temp)
 			}
@@ -86,8 +91,8 @@ func GetStatData() []StatData {
 	return result
 }
 
-func GetMonthStatDataByUser(month time.Time, userId string) []StatData {
-	var result []StatData
+func GetMonthStatDataByUser(month time.Time, userId string) StatData {
+	var result StatData
 
 	db := connectDB()
 

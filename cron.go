@@ -13,7 +13,7 @@ import (
 
 func PushChartMonthlyCron() {
 	c := cron.New(cron.WithChain(cron.SkipIfStillRunning(cron.DefaultLogger)))
-	c.AddFunc("*/5 * * * *", func() {
+	c.AddFunc("0 9 1 */1 *", func() {
 		userId := os.Getenv("TestUserId")
 		now := time.Now()
 		thisMonth := time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, now.Location())
@@ -21,8 +21,8 @@ func PushChartMonthlyCron() {
 
 		var chartData []chart.Value
 
-		for _, v := range stats {
-			chartData = append(chartData, chart.Value{Label: fmt.Sprintf("%s $%d", v.Class, v.Total), Value: float64(v.Total)})
+		for _, v := range stats.Data {
+			chartData = append(chartData, chart.Value{Label: fmt.Sprintf("%s $%d", v.Class, v.Sum), Value: float64(v.Sum)})
 		}
 
 		chart := GetChart(chartData)

@@ -70,7 +70,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 					var chartData []chart.Value
 
 					for _, v := range stats {
-						chartData = append(chartData, chart.Value{Label: v.Class, Value: float64(v.Total)})
+						chartData = append(chartData, chart.Value{Label: v.Class, Value: float64(v.Sum)})
 					}
 
 					chart := GetChart(chartData)
@@ -91,8 +91,8 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 
 					var chartData []chart.Value
 
-					for _, v := range stats {
-						chartData = append(chartData, chart.Value{Label: fmt.Sprintf("%s $%d", v.Class, v.Total), Value: float64(v.Total)})
+					for _, v := range stats.Data {
+						chartData = append(chartData, chart.Value{Label: fmt.Sprintf("%s $%d", v.Class, v.Sum), Value: float64(v.Sum)})
 					}
 
 					chart := GetChart(chartData)
