@@ -39,10 +39,10 @@ func ConvertToRecord(data OperationData) *Record {
 
 func (r *Record) Save() bool {
 	db := connectDB()
+	defer closeDB(db)
+
 	if db != nil {
 		db.Create(r)
-		closeDB(db)
-
 		return true
 	} else {
 		return false
@@ -57,6 +57,8 @@ func GetLastRecords(num uint) []Record {
 	var records []Record
 
 	db := connectDB()
+	defer closeDB(db)
+
 	if db != nil {
 		db.Order("id desc").Limit(int(num)).Find(&records)
 	}
@@ -68,6 +70,7 @@ func GetStatData() []ClassWithSum {
 	var result []ClassWithSum
 
 	db := connectDB()
+	defer closeDB(db)
 
 	if db != nil {
 		rows, err := db.Model(&Record{}).Select("class, sum(cost) as total").Group("class").Rows()
@@ -91,28 +94,30 @@ func GetStatData() []ClassWithSum {
 	return result
 }
 
+func GetMonthPushUsers(month time.Time) []string {
+	db := connectDB()
+	defer closeDB(db)
+
+	var result []string
+
+	nextMonth := month.AddDate(0, 1, 0)
+
+	db.Model(&Record{}).Select("user_id").Where("created_at BETWEEN ? and ?", month, nextMonth).Distinct().Scan(&result)
+
+	return result
+}
+
 func GetMonthStatDataByUser(month time.Time, userId string) StatData {
 	var result StatData
 
 	db := connectDB()
+	defer closeDB(db)
 
 	nextMonth := month.AddDate(0, 1, 0)
 
 	if db != nil {
-		db.Model(&Record{}).Select("class, sum(cost) as total").Where("user_id = ? AND created_at BETWEEN ? and ?", userId, month, nextMonth).Group("class").Scan(&result)
-
-		// if err == nil {
-		// 	defer rows.Close()
-
-		// 	for rows.Next() {
-		// 		log.Println("rows=", rows)
-		// 		var temp StatData
-		// 		db.ScanRows(rows, &temp)
-		// 		result = append(result, temp)
-		// 	}
-		// } else {
-		// 	log.Println("GetStatData err=", err)
-		// }
+		db.Model(&Record{}).Select("class, SUM(cost) AS sum").Where("user_id = ? AND created_at BETWEEN ? and ?", userId, month, nextMonth).Group("class").Scan(&(result.Data))
+		db.Model(&Record{}).Select("sum(cost)").Where("user_id = ? AND created_at BETWEEN ? and ?", userId, month, nextMonth).Scan(&(result.Total))
 	}
 
 	log.Println("StatData=", result)
@@ -141,8 +146,9 @@ func closeDB(db *gorm.DB) {
 
 func init() {
 	db := connectDB()
+	defer closeDB(db)
+
 	if !db.Migrator().HasTable(&Record{}) {
 		db.AutoMigrate(&Record{})
 	}
-	closeDB(db)
 }
