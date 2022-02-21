@@ -21,7 +21,7 @@ func PushChartMonthlyCron() {
 	c := cron.New(cron.WithChain(cron.SkipIfStillRunning(cron.DefaultLogger)))
 
 	//Every first day of month at 9:00
-	c.AddFunc("05 18 21 */1 *", func() {
+	c.AddFunc("0 9 1 */1 *", func() {
 		now := time.Now()
 		month = time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, now.Location())
 
@@ -62,7 +62,7 @@ func pushMonthlyStatChartToUser(userId string) {
 
 	// format statistic data to chart data
 	for _, v := range stats.Data {
-		chartData = append(chartData, chart.Value{Label: fmt.Sprintf("%s $%d (%.2f%%)", v.Class, v.Sum, float64(v.Sum/stats.Total)), Value: float64(v.Sum)})
+		chartData = append(chartData, chart.Value{Label: fmt.Sprintf("%s $%d (%.2f%%)", v.Class, v.Sum, float64(v.Sum)/float64(stats.Total)), Value: float64(v.Sum)})
 	}
 
 	chart := GetChart(chartData)
